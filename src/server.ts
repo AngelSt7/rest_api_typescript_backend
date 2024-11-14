@@ -22,12 +22,25 @@ connectDB()
 
 const server = express()
 
+// Permitir conexiones
 const corsOptions: CorsOptions = {
     origin: (origin, callback) => {
+        // Verificar si el origen de la solicitud coincide con el permitido
         if (origin === process.env.FRONTEND_URL) {
             callback(null, true);
         } else {
-            callback(new Error('Error de CORS'));
+            // Mostrar un mensaje de error más descriptivo
+            const errorMessage = `
+                CORS Error: La solicitud fue bloqueada porque el origen de la solicitud:
+                ${origin} no coincide con la URL permitida configurada en FRONTEND_URL:
+                ${process.env.FRONTEND_URL}.
+                
+                Asegúrate de que el frontend esté enviando solicitudes desde la URL correcta.
+                Si estás trabajando en desarrollo, revisa si tu entorno local tiene configurada correctamente la URL del frontend.
+                
+                Este error ocurrió cuando la API intentó procesar una solicitud de un origen no permitido.
+            `;
+            callback(new Error(errorMessage));
         }
     },
     optionsSuccessStatus: 200
